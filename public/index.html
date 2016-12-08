@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Socket.IO chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font: 13px Helvetica, Arial;
+        }
+        
+        form {
+            background: #000;
+            padding: 3px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        form input {
+            border: 0;
+            padding: 10px;
+            width: 90%;
+            margin-right: .5%;
+        }
+        
+        form button {
+            width: 9%;
+            background: rgb(130, 224, 255);
+            border: none;
+            padding: 10px;
+        }
+        
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #messages li {
+            padding: 5px 10px;
+        }
+        
+        #messages li:nth-child(odd) {
+            background: #eee;
+        }
+        
+        .hide {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="header">Hello</h1>
+    <div id="nicknameheader" class="hide">
+        <p>
+            Type in your nickname here:
+        </p>
+        <input type="text" id="input_nickname" />
+    </div>
+    <canvas id="demoCanvas" width="500" height="300"></canvas>
+
+    <script src="/cookie.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
+
+    <script>
+    players = {};
+        function init() {
+            stage = new createjs.Stage("demoCanvas");
+                } 
+    </script>
+
+    <script>
+  var socket = io();
+  px=100;
+  py=100;
+  window.addEventListener('keydown',this.check,false);
+
+function check(e) {
+    
+    var shouldUpdate = false;
+    var update = {};
+          update.x = px;
+      update.y = py;
+    if (e.keyCode == 37) {
+update.x -=10;
+shouldUpdate = true;
+    }
+        if (e.keyCode == 39) {
+update.x +=10;
+shouldUpdate = true;
+    }
+        if (e.keyCode == 38) {
+update.y -=10;
+shouldUpdate = true;
+    }
+        if (e.keyCode == 40) {
+update.y +=10;
+shouldUpdate = true;
+    }
+      
+if (shouldUpdate) {
+    socket.emit('chat message', update);
+}
+
+}
+// socket.on('add player', function(player) {
+//     var newP = new createjs.Shape();
+// newP.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 15);
+// newP.x = player.x;
+// newP.y = player.y;
+// stage.addChild(newP);
+// stage.update();
+// players[player.nickname] = newP; 
+// });
+socket.on('remove player', function(player) {
+var player = players[player.nickname];
+stage.removeChild(player.textObj);
+stage.removeChild(player);
+stage.update();
+players[player.nickname] = null; 
+});
+
+  socket.on('chat message', function(msg){
+      for(key in msg.allPlayers) {
+var player =msg.allPlayers[key];
+console.log('processing player ' + player.nickname);
+if (player.nickname == window.nickname) {
+    px = player.x;
+    py = player.y;
+}
+var localP = players[player.nickname];
+if (localP == null) {
+        var newP = new createjs.Shape();
+newP.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 15);
+newP.x = player.x;
+newP.y = player.y;
+stage.addChild(newP);
+
+ var text = new createjs.Text(player.nickname, "20px Arial", "#ff7700");
+ text.x = newP.x;
+ text.y = newP.y;
+ text.textBaseline = "alphabetic";
+ stage.addChild(text);
+newP.textObj = text;
+players[player.nickname] = newP; 
+localP = newP;
+console.log('did not find local shape object for ' + player.nickname + ". So adding a new one!");
+}
+localP.x = player.x;
+localP.y = player.y;
+localP.textObj.x = localP.x;
+localP.textObj.y = localP.y;
+      }
+      stage.update();
+  });
+  
+  window.nickname = Cookies.get('nickname');
+  if (window.nickname == null) {
+      $("#header").text("Hello, please enter your name!");
+      $("#input_nickname").on('keyup', function (e) {
+    if (e.keyCode == 13) {
+        window.nickname=$("#input_nickname").val();
+        Cookies.set('nickname', window.nickname);
+      $("#header").text("Thank you for entering your nickname, " + window.nickname);
+      $("#nicknameheader").addClass("hide");        
+    }
+});
+$("#nicknameheader").removeClass("hide");
+  }
+  else {
+      $("#header").text("Hello, your name is: " + window.nickname);
+      socket.emit("add player", {nickname: window.nickname});
+  }
+  $(()=>{
+      init();
+  });
+</script>
+</body>
+
+</html>

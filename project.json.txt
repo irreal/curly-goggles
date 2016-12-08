@@ -1,0 +1,6 @@
+{
+  "name": "igrica",
+  "version": "0.0.1",
+  "description": "mala igrica da se zezamo",
+  "dependencies": {}
+}
