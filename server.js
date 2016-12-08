@@ -37,13 +37,13 @@ socket.on('add player',function(start) {
       return;
     }
     console.log("Message from " + p.nickname + " x: " + msg.x + ' y: ' + msg.y);
-    p.x = msg.x;
-    p.y = msg.y;
+    p.x += msg.x;
+    p.y += msg.y;
 
      io.emit('chat message', {allPlayers: players});
   });
 });
-process.env.PORT = process.env.PORT || 80;
+process.env.PORT = process.env.PORT || 3000;
 http.listen(process.env.PORT, function(){
   console.log('listening on *:' + process.env.PORT);
 });

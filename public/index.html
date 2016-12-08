@@ -88,8 +88,8 @@ function check(e) {
     
     var shouldUpdate = false;
     var update = {};
-          update.x = px;
-      update.y = py;
+          update.x = 0;
+      update.y = 0;
     if (e.keyCode == 37) {
 update.x -=10;
 shouldUpdate = true;
@@ -172,6 +172,7 @@ localP.textObj.y = localP.y;
         Cookies.set('nickname', window.nickname);
       $("#header").text("Thank you for entering your nickname, " + window.nickname);
       $("#nicknameheader").addClass("hide");        
+      socket.emit("add player", {nickname: window.nickname});
     }
 });
 $("#nicknameheader").removeClass("hide");
