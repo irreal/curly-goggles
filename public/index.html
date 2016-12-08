@@ -109,6 +109,8 @@ shouldUpdate = true;
       
 if (shouldUpdate) {
     socket.emit('chat message', update);
+    players[window.nickname].x += update.x;
+    players[window.nickname].y += update.y;
 }
 
 }
@@ -155,8 +157,10 @@ players[player.nickname] = newP;
 localP = newP;
 console.log('did not find local shape object for ' + player.nickname + ". So adding a new one!");
 }
+if (player.nickname != window.nickname) {
 localP.x = player.x;
 localP.y = player.y;
+}
 localP.textObj.x = localP.x;
 localP.textObj.y = localP.y;
       }
