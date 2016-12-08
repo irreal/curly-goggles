@@ -43,7 +43,7 @@ socket.on('add player',function(start) {
      io.emit('chat message', {allPlayers: players});
   });
 });
-
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+process.env.PORT = process.env.PORT || 80;
+http.listen(process.env.PORT, function(){
+  console.log('listening on *:' + process.env.PORT);
 });
